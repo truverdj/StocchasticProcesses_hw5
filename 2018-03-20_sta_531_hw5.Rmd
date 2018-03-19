@@ -11,6 +11,78 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 #### (1) Some weird Bernoulli stuff
 
+Let $Z_i$ be iid $N(\alpha, \sigma^2)$ and $X_1,\dots,X_n$ be independent Bernoulli random variables given by:
+$$
+X_i = 
+\begin{cases}
+0 & Z_i \leq u \\
+1 & Z_i > u
+\end{cases}
+$$
+
+##### (a) Likelihood 
+
+$$
+\begin{aligned}
+L(p) 
+&= \prod_{i=1}^n p^{x_i}(1-p)^{1-x_i} \\
+&= p^{\sum x_i}(1-p)^{\sum(1-x_i)} \\
+&= p^{\sum x_i}(1-p)^{n- \sum x_i}
+\end{aligned}
+$$
+
+And, as for p,
+
+$$
+p = Pr(X_i = 1) = Pr(Z_i > u) = \int_u^\infty N(x;\alpha, \sigma^2) = \Phi\left(\frac{\alpha - u}{\sigma} \right),
+$$
+
+where $\Phi$ denotes the cdf of the normal distribution. 
+
+##### (b) Complete-Data Log Likelihood
+
+The log-likelihood of the $z_i$'s is the standard normal log-likelihood.
+$$
+l^C(\alpha,\sigma^2) = -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum(Z_i - \alpha)^2
+$$
+
+We then take the expectation conditional on the $x_i$'s and use the book's notation to denote this as $Q$.
+
+$$
+\begin{aligned}
+Q(\alpha,\sigma^2) 
+&= E\left[-\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum(Z_i - \alpha)^2 \mid x \right] \\
+&= -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum E\left[(Z_i - \alpha)^2\mid x_i \right] \\
+&= -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum\left[E(Z_i^2\mid x_i) -2\alpha E(Z_i\mid x_i) + \alpha^2\right]
+\end{aligned}
+$$
+
+##### (c) The M-step
+
+We want
+
+$$
+\begin{aligned}
+\arg\max_\alpha Q 
+&= \arg\max_\alpha \sum\left[ 2\alpha E(Z_i\mid x_i, \hat{\alpha_{(j)}}, \hat{\sigma^2_{(j)}}) - E(Z_i^2\mid x_i, \hat{\alpha_{(j)}}, \hat{\sigma^2_{(j)}}) - \alpha^2 \right] \\
+&= \arg\max_\alpha \sum\left[ 2\alpha E(Z_i\mid x_i, \hat{\alpha_{(j)}}, \hat{\sigma^2_{(j)}})\right] - n\alpha^2 \\
+&= \frac{1}{n}\sum E(Z_i\mid x_i, \hat{\alpha_{(j)}}, \hat{\sigma^2_{(j)}}) \\
+&= \hat{\alpha}_{(j+1)}
+\end{aligned}
+$$
+
+where we obtain the last equality by setting the derivative with respect to $\alpha$ equal to 0. We'll do the same for $\sigma^2$.
+
+$$
+\begin{aligned}
+0 
+&= -\frac{n}{2\sigma^2} + \frac{1}{2(\sigma^2)^2}\sum(v_i -2\alpha t_i + \alpha^2) \\
+\sigma^2 &= \frac{1}{n} \left[ \sum v_i -2\alpha\sum t_i + n\alpha^2 \right] \\
+&= \frac{1}{n}\left[ \sum v_i -(\frac{1}{n}\sum t_i)^2 \right] \quad (\text{from above}) 
+\end{aligned}
+$$
+
+
 #### (2) Why we gotta classify the animals? It's 2018, let them be who they want.
 
 ##### (a) Likelihood
