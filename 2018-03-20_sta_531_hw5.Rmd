@@ -1,0 +1,105 @@
+---
+title: "Sta 531 HW5 (The one due right after spring break)"
+author: "Daniel Truver"
+date: "3/18/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+#### (1) Some weird Bernoulli stuff
+
+#### (2) Why we gotta classify the animals? It's 2018, let them be who they want.
+
+##### (a) Likelihood
+
+$$
+\begin{aligned}
+& L(Y_1 \mid \theta) = \frac{197!}{125!~18!~20!~34!}\left(\frac{2+\theta}{4}\right)^{125}\left(\frac{1-\theta}{4}\right)^{18}\left(\frac{1-\theta}{4}\right)^{20}\left(\frac{\theta}{4}\right)^{34} \\
+& L(Y_2 \mid \theta) = \frac{20!}{14!~0!~1!~5!}\left(\frac{2+\theta}{4}\right)^{14}\left(\frac{1-\theta}{4}\right)\left(\frac{\theta}{4}\right)^{5} 
+\end{aligned}
+$$
+
+##### (b) Newton-Raphson 
+
+Note that when we take the log-likelihood, we will ignore the constant at the front and instead maximize:
+$$
+l(Y_1\mid\theta) = 125\log\left(\frac{2+\theta}{4}\right) + 18\log\left(\frac{1-\theta}{4} \right) + 20\log\left(\frac{1-\theta}{4} \right) + 34 \log\left( \frac{\theta}{4} \right)
+$$
+
+```{r newtonRaphsonB}
+likeB = function(theta){
+  125*log((2+theta)/4) + 18*log((1-theta)/4) + 20*log((1-theta)/4) + 34*log(theta/4)
+}
+dlikeB = function(theta){ 
+  125/4 * 4/(2+theta) - 18/4 * 4/(1-theta) - 20/4 * 4/(1-theta) + 34/4 * 4/theta
+}
+d2likeB = function(theta){
+  -125/(2+theta)^2 - 18/(1-theta)^2 - 20/(1-theta)^2 - 34/(theta)^2
+}
+resB = NULL
+for (theta_0 in c(.1,.2,.3,.4,.6,.8)){
+  x = c(theta_0,rep(NA, 100))
+  for (j in 1:100){
+    x[j+1] = x[j] - dlikeB(x[j])/d2likeB(x[j])
+  }
+  resB = cbind(resB, x)
+}
+library(dplyr)
+resB = data.frame(iteration = 1:101, resB) 
+colnames(resB) = c("iteration", "x.1", "x.2", "x.3", "x.4", "x.6", "x.8")
+library(ggplot2)
+ggplot(data = resB, aes(x = iteration)) +
+  geom_line(aes(y = x.1, color = ".1")) +
+  geom_line(aes(y = x.2, color = ".2")) +
+  geom_line(aes(y = x.3, color = ".3")) +
+  geom_line(aes(y = x.4, color = ".4")) +
+  geom_line(aes(y = x.6, color = ".6")) +
+  geom_line(aes(y = x.8, color = ".8")) +
+  theme_bw() +
+  xlim(0,13) +
+  ggtitle("Convergence of the Newton-Rapshon") +
+  ylab("value")
+```
+
+#### (c) Newton-Raphson again
+
+```{r newtRaphC}
+likeC = function(theta){
+  14*log((2+theta)/4)  + 1*log((1-theta)/4) + 5*log(theta/4)
+}
+dlikeC = function(theta){ 
+  14/4 * 4/(2+theta) - 1/4 * 4/(1-theta) + 5/4 * 4/theta
+}
+d2likeC = function(theta){
+  -14/(2+theta)^2 -1/(1-theta)^2 - 5/(theta)^2
+}
+resC = NULL
+for (theta_0 in c(.1,.2,.3,.4,.6,.8)){
+  x = c(theta_0,rep(NA, 100))
+  for (j in 1:100){
+    x[j+1] = x[j] - dlikeC(x[j])/d2likeC(x[j])
+  }
+  resC = cbind(resC, x)
+}
+library(dplyr)
+resC = data.frame(iteration = 1:101, resC) 
+colnames(resC) = c("iteration", "x.1", "x.2", "x.3", "x.4", "x.6", "x.8")
+library(ggplot2)
+ggplot(data = resC, aes(x = iteration)) +
+  geom_line(aes(y = x.1, color = ".1")) +
+  geom_line(aes(y = x.2, color = ".2")) +
+  geom_line(aes(y = x.3, color = ".3")) +
+  geom_line(aes(y = x.4, color = ".4")) +
+  geom_line(aes(y = x.6, color = ".6")) +
+  geom_line(aes(y = x.8, color = ".8")) +
+  theme_bw() +
+  xlim(0,10) + 
+  ylim(0,10) +
+  ggtitle("Convergence of the Newton-Rapshon") +
+  ylab("value")
+```
+
+We see that 0.6 and 0.3 starting points do not lead to convergence of the Newton-Raphson algorithm in this case. 
