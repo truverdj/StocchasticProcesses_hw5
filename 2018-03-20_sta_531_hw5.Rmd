@@ -178,7 +178,7 @@ We see that 0.6 and 0.3 starting points do not lead to convergence of the Newton
 
 ##### (d) Assymptotic Normality 
 
-```{r mleB, echo=FALSE}
+```{r, echo=FALSE}
 mleB = 0.6268
 varB = -1/(-197/4 *((2+mleB)^-2 + 2*(1-mleB)^-1) + mleB^-1)
 nB = 197
