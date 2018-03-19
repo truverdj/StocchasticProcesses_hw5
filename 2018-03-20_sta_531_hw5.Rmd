@@ -103,3 +103,47 @@ ggplot(data = resC, aes(x = iteration)) +
 ```
 
 We see that 0.6 and 0.3 starting points do not lead to convergence of the Newton-Raphson algorithm in this case. 
+
+##### (d) Assymptotic Normality 
+
+```{r mleB, echo=FALSE}
+mleB = 0.6268
+varB = -1/(-197/4 *((2+mleB)^-2 + 2*(1-mleB)^-1) + mleB^-1)
+nB = 197
+theta.plot = seq(0,1,length.out = 100)
+LikeB = function(theta){
+  ((2+theta)/4)^125 * ((1-theta)/4)^18 * ((1-theta)/4)^20 * ((theta)/4)^34
+}
+plotB = data.frame(theta = theta.plot, 
+                   Likelihood = LikeB(theta.plot)/integrate(LikeB, 0, 1)$value, 
+                   norm = dnorm(theta.plot, mean = mleB, sd = sqrt(varB)))
+ggplot(data = plotB, aes(x = theta)) +
+  geom_line(aes(y = Likelihood, color = "Likelihood")) +
+  geom_line(aes(y = norm, color = "Normal Approximation")) +
+  theme_bw() +
+  ggtitle("Normalized Likelihood and Normal Approximation")
+```
+
+This normal approximation looks pretty good.
+
+##### (d) Assymptotic Normality round 2
+
+```{r mleB, echo=FALSE}
+mleC = 0.9034
+varC = -1/(-20/4 *((2+mleB)^-2 + 2*(1-mleB)^-1) + mleB^-1)
+nC = 197
+theta.plot = seq(0,1,length.out = 100)
+LikeC = function(theta){
+  ((2+theta)/4)^14 * ((1-theta)/4)^0 * ((1-theta)/4)^1 * ((theta)/4)^5
+}
+plotC = data.frame(theta = theta.plot, 
+                   Likelihood = LikeC(theta.plot)/integrate(LikeC, 0, 1)$value, 
+                   norm = dnorm(theta.plot, mean = mleC, sd = sqrt(varC)))
+ggplot(data = plotC, aes(x = theta)) +
+  geom_line(aes(y = Likelihood, color = "Likelihood")) +
+  geom_line(aes(y = norm, color = "Normal Approximation")) +
+  theme_bw() +
+  ggtitle("Normalized Likelihood and Normal Approximation") 
+```
+
+The normal approximation does not look so good here.
